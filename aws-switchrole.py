@@ -95,6 +95,7 @@ try:
 
   print_color(color.green)
   print "Got temporary credentials for profile '{}'".format(profile)
+  print_color(color.normal)
 
   for k, v in env_vars.iteritems():
     print "export {}={}".format(k,v)
