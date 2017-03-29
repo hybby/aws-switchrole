@@ -98,7 +98,7 @@ try:
   print_color(color.normal)
 
   for k, v in env_vars.iteritems():
-    print "export {}={}".format(k,v)
+    print " export {}={}".format(k,v)
 
 except:
   print_color(color.red)
