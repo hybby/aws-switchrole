@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # switchrole.py: a script to generate temporary credentials for aws roles.
 # use it if you need environment variablised credentials for use with tools
-# that don't support role switching (looking at you apex).
+# that don't support role switching (looking at you apex and terraform).
 import os
 import ConfigParser
 import argparse
@@ -9,6 +9,8 @@ import time
 import subprocess
 import json
 import sys
+import re
+
 
 # colors
 class color:
@@ -25,6 +27,58 @@ def print_color(color):
   sys.stdout.write(color)
   sys.stdout.flush()
 
+# given a list of config sections, return a list of those that look like profiles
+def get_profiles(config_sections):
+  profiles = []
+  profile_pattern = re.compile('^profile (\w+)$')
+
+  for section in config_sections:
+    result = profile_pattern.search(section)
+    if result:
+      profiles.append(result.group(1))
+
+  return profiles
+
+def get_profile_choice(profiles):
+  i = 0
+  valid_choice = False
+
+  print_color(color.yellow)
+  print 'please choose your profile:'
+  print_color(color.normal)
+
+  for profile in profiles:
+    print "  {}. {}".format((i + 1), profile)
+    i += 1
+
+  while not valid_choice:
+    try:
+      choice = int(raw_input("-> "))
+    except ValueError:
+      choice = 0
+
+    if choice > 0 and choice < (len(profiles) + 1):
+        print "nice"
+        valid_choice = True
+        return profiles[(choice - 1)]
+    else:
+      print_color(color.yellow)
+      print 'please choose a valid value'
+      print_color(color.normal)
+
+  else:
+    print_color(color.red)
+    print "FATAL: couldn't find any profiles in '{}'".format(config_file)
+    print_color(color.normal)
+    sys.exit(1)
+
+
+# open our aws config file
+config_file = '~/.aws/config'
+config = ConfigParser.RawConfigParser()
+config.read(os.path.expanduser(config_file))
+profiles = get_profiles(config.sections())
+
 # parse command-line arguments
 parser = argparse.ArgumentParser(
   description='gets temporary credentials for switching to an aws role'
@@ -33,20 +87,21 @@ parser = argparse.ArgumentParser(
 parser.add_argument(
   '--profile',
   type=str,
-  required=True,
+  required=False,
   help='profile in ~/.aws/config with role you want to switch to'
 )
 
 args = parser.parse_args()
-profile = args.profile
+
+if args.profile:
+  profile = args.profile
+else:
+  profile = get_profile_choice(profiles)
+
 print_color(color.yellow)
 print "Using profile '{}'".format(profile)
 print_color(color.normal)
 
-# read aws config and get role_arn from profile provided
-config_file = '~/.aws/config'
-config = ConfigParser.ConfigParser()
-config.read(os.path.expanduser(config_file))
 
 try:
   role = config.get("profile {}".format(profile), "role_arn")
