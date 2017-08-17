@@ -10,7 +10,7 @@ import subprocess
 import json
 import sys
 import re
-
+import shutil
 
 # colors
 class color:
@@ -22,10 +22,15 @@ class color:
   underline = '\033[4m'
   normal = '\033[0m'
 
+# -----------
+# subroutines
+# -----------
+
+# print color codes that correspond with the above class
 def print_color(color):
-  # no pesky newlines when printing colour escape codes plz
-  sys.stdout.write(color)
+  sys.stdout.write(color) # no pesky newlines plz
   sys.stdout.flush()
+
 
 # given a list of config sections, return a list of those that look like profiles
 def get_profiles(config_sections):
@@ -38,6 +43,7 @@ def get_profiles(config_sections):
       profiles.append(result.group(1))
 
   return profiles
+
 
 def get_profile_choice(profiles):
   i = 0
@@ -65,99 +71,103 @@ def get_profile_choice(profiles):
       print_color(color.yellow)
       print 'please choose a valid value'
       print_color(color.normal)
-
   else:
     print_color(color.red)
     print "FATAL: couldn't find any profiles in '{}'".format(config_file)
     print_color(color.normal)
     sys.exit(1)
 
+# ---------
+# main
+# ---------
 
-# open our aws config file
-config_file = '~/.aws/config'
-config = ConfigParser.RawConfigParser()
-config.read(os.path.expanduser(config_file))
-profiles = get_profiles(config.sections())
+if __name__ == "__main__":
 
-# parse command-line arguments
-parser = argparse.ArgumentParser(
-  description='gets temporary credentials for switching to an aws role'
-)
+  # open our aws config file
+  config_file = '~/.aws/config'
+  config = ConfigParser.RawConfigParser()
+  config.read(os.path.expanduser(config_file))
+  profiles = get_profiles(config.sections())
 
-parser.add_argument(
-  '--profile',
-  type=str,
-  required=False,
-  help='profile in ~/.aws/config with role you want to switch to'
-)
+  # parse command-line arguments
+  parser = argparse.ArgumentParser(
+    description='gets temporary credentials for switching to an aws role'
+  )
 
-args = parser.parse_args()
+  parser.add_argument(
+    '--profile',
+    type=str,
+    required=False,
+    help='profile in ~/.aws/config with role you want to switch to'
+  )
 
-if args.profile:
-  profile = args.profile
-else:
-  profile = get_profile_choice(profiles)
+  args = parser.parse_args()
 
-print_color(color.yellow)
-print "Using profile '{}'".format(profile)
-print_color(color.normal)
+  if args.profile:
+    profile = args.profile
+  else:
+    profile = get_profile_choice(profiles)
 
-
-try:
-  role = config.get("profile {}".format(profile), "role_arn")
-except:
-  print_color(color.red)
-  print "FATAL: couldn't find profile '{}' in '{}'".format(profile, config_file)
-  print_color(color.normal)
-  sys.exit(1)
-
-# give our role switch session a name and build our aws command
-session = profile + '-' + time.strftime('%d%m%y%H%M%S')
-cmd = [
-  'aws', 'sts', 'assume-role',
-  '--role-arn', role,             # Role ARN
-  '--role-session-name', session, # Session ID given to temporary credentials
-  '--profile', profile,           # Profile name from ~/.aws/config
-]
-
-process = subprocess.Popen(cmd, stdout=subprocess.PIPE)
-out, err = process.communicate()
-
-# load the json response into a dict
-try:
-  creds = json.loads(out)
-except:
-  print_color(color.red)
-  print 'Problem parsing response from AWS.  STDOUT and STDERR below:'
   print_color(color.yellow)
-  print 'STDOUT:'
-  print_color(color.normal)
-  print out
-  print_color(color.yellow)
-  print 'STDERR:'
-  print_color(color.normal)
-  print err
-  sys.exit(1)
-
-# print out our returned values as export commands, ready to go.
-try:
-  env_vars = {
-    'AWS_ACCESS_KEY_ID': creds['Credentials']['AccessKeyId'],
-    'AWS_SECRET_ACCESS_KEY': creds['Credentials']['SecretAccessKey'],
-    'AWS_SESSION_TOKEN': creds['Credentials']['SessionToken'],
-    'AWS_SECURITY_TOKEN': creds['Credentials']['SessionToken'],
-  }
-
-  print_color(color.green)
-  print "Got temporary credentials for profile '{}'".format(profile)
+  print "Using profile '{}'".format(profile)
   print_color(color.normal)
 
-  for k, v in env_vars.iteritems():
-    print "export {}={}".format(k,v)
 
-except:
-  print_color(color.red)
-  print 'Response from AWS did not contain expected values.  Dumping below:'
-  print_color(color.normal)
-  print creds
-  sys.exit(1)
+  try:
+    role = config.get("profile {}".format(profile), "role_arn")
+  except:
+    print_color(color.red)
+    print "FATAL: couldn't find profile '{}' in '{}'".format(profile, config_file)
+    print_color(color.normal)
+    sys.exit(1)
+
+  # give our role switch session a name and build our aws command
+  session = profile + '-' + time.strftime('%d%m%y%H%M%S')
+  cmd = [
+    shutil.which('aws'), 'sts', 'assume-role',
+    '--role-arn', role,             # Role ARN
+    '--role-session-name', session, # Session ID given to temporary credentials
+    '--profile', profile,           # Profile name from ~/.aws/config
+  ]
+
+  process = subprocess.Popen(cmd, stdout=subprocess.PIPE)
+  out, err = process.communicate()
+
+  # load the json response into a dict
+  try:
+    creds = json.loads(out)
+  except:
+    print_color(color.red)
+    print 'Problem parsing response from AWS.  STDOUT and STDERR below:'
+    print_color(color.yellow)
+    print 'STDOUT:'
+    print_color(color.normal)
+    print out
+    print_color(color.yellow)
+    print 'STDERR:'
+    print_color(color.normal)
+    print err
+    sys.exit(1)
+
+  # print out our returned values as export commands, ready to go.
+  try:
+    env_vars = {
+      'AWS_ACCESS_KEY_ID': creds['Credentials']['AccessKeyId'],
+      'AWS_SECRET_ACCESS_KEY': creds['Credentials']['SecretAccessKey'],
+      'AWS_SESSION_TOKEN': creds['Credentials']['SessionToken'],
+      'AWS_SECURITY_TOKEN': creds['Credentials']['SessionToken'],
+    }
+
+    print_color(color.green)
+    print "Got temporary credentials for profile '{}'".format(profile)
+    print_color(color.normal)
+
+    for k, v in env_vars.iteritems():
+      print "export {}={}".format(k,v)
+
+  except:
+    print_color(color.red)
+    print 'Response from AWS did not contain expected values.  Dumping below:'
+    print_color(color.normal)
+    print creds
+    sys.exit(1)
