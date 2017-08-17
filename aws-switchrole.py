@@ -32,6 +32,25 @@ def print_color(color):
   sys.stdout.flush()
 
 
+def print_error(text):
+  print_color(color.red)
+  print text
+  print_color(color.normal)
+  sys.exit(1)
+
+
+def print_warning(text):
+  print_color(color.yellow)
+  print text
+  print_color(color.normal)
+
+
+def print_ok(text):
+  print_color(color.green)
+  print text
+  print_color(color.normal)
+
+
 # given a list of config sections, return a list of those that look like profiles
 def get_profiles(config_sections):
   profiles = []
@@ -49,9 +68,7 @@ def get_profile_choice(profiles):
   i = 0
   valid_choice = False
 
-  print_color(color.yellow)
-  print 'please choose your profile:'
-  print_color(color.normal)
+  print_warning('no profile provided. please choose your profile:')
 
   for profile in profiles:
     print "  {}. {}".format((i + 1), profile)
@@ -68,13 +85,9 @@ def get_profile_choice(profiles):
         valid_choice = True
         return profiles[(choice - 1)]
     else:
-      print_color(color.yellow)
-      print 'please choose a valid value'
-      print_color(color.normal)
+      print_warning('please choose a valid value')
   else:
-    print_color(color.red)
-    print "FATAL: couldn't find any profiles in '{}'".format(config_file)
-    print_color(color.normal)
+    print_error("FATAL: couldn't find any profiles in '{}'".format(config_file))
     sys.exit(1)
 
 # ---------
@@ -108,18 +121,13 @@ if __name__ == "__main__":
   else:
     profile = get_profile_choice(profiles)
 
-  print_color(color.yellow)
-  print "Using profile '{}'".format(profile)
-  print_color(color.normal)
+  print_ok("using profile '{}'".format(profile))
 
 
   try:
     role = config.get("profile {}".format(profile), "role_arn")
   except:
-    print_color(color.red)
-    print "FATAL: couldn't find profile '{}' in '{}'".format(profile, config_file)
-    print_color(color.normal)
-    sys.exit(1)
+    print_error("FATAL: couldn't find profile '{}' in '{}'".format(profile, config_file))
 
   # give our role switch session a name and build our aws command
   session = profile + '-' + time.strftime('%d%m%y%H%M%S')
@@ -137,8 +145,7 @@ if __name__ == "__main__":
   try:
     creds = json.loads(out)
   except:
-    print_color(color.red)
-    print 'Problem parsing response from AWS.  STDOUT and STDERR below:'
+    print_warning('Problem parsing response from AWS.  STDOUT and STDERR below:')
     print_color(color.yellow)
     print 'STDOUT:'
     print_color(color.normal)
@@ -158,16 +165,11 @@ if __name__ == "__main__":
       'AWS_SECURITY_TOKEN': creds['Credentials']['SessionToken'],
     }
 
-    print_color(color.green)
-    print "Got temporary credentials for profile '{}'".format(profile)
-    print_color(color.normal)
+    print_ok("Got temporary credentials for profile '{}'".format(profile))
 
     for k, v in env_vars.iteritems():
       print "export {}={}".format(k,v)
 
   except:
-    print_color(color.red)
-    print 'Response from AWS did not contain expected values.  Dumping below:'
-    print_color(color.normal)
-    print creds
+    print_error('Response from AWS did not contain expected values.  Dumping below:\n{}'.format(creds))
     sys.exit(1)
