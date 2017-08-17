@@ -81,7 +81,6 @@ def get_profile_choice(profiles):
       choice = 0
 
     if choice > 0 and choice < (len(profiles) + 1):
-        print "nice"
         valid_choice = True
         return profiles[(choice - 1)]
     else:
