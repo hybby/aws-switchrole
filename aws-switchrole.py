@@ -89,6 +89,7 @@ def get_profile_choice(profiles):
     print_error("FATAL: couldn't find any profiles in '{}'".format(config_file))
     sys.exit(1)
 
+
 # ---------
 # main
 # ---------
