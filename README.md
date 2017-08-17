@@ -12,6 +12,8 @@ provide a profile name that you have configured in `~/.aws/config`
 $ aws-switchrole.py --profile profile-name
 ```
 
+if you don't provide a profile, you'll be asked to pick from a list.
+
 we then use the `role_arn` to perform an `aws sts assume-role` command and
 print out the resultant credentials as `export` commands, ready for you to
 use.  for example:
