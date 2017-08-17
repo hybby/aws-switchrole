@@ -63,7 +63,7 @@ def get_profiles(config_sections):
 
   return profiles
 
-
+# given a list of profiles, ask the user to pick one and return that.
 def get_profile_choice(profiles):
   i = 0
   valid_choice = False
