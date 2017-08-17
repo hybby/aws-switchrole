@@ -167,7 +167,7 @@ if __name__ == "__main__":
     print_ok("Got temporary credentials for profile '{}'".format(profile))
 
     for k, v in env_vars.iteritems():
-      print "export {}={}".format(k,v)
+      print " export {}={}".format(k,v)
 
   except:
     print_error('Response from AWS did not contain expected values.  Dumping below:\n{}'.format(creds))
