@@ -10,7 +10,7 @@ import subprocess
 import json
 import sys
 import re
-import shutil
+from distutils.spawn import find_executable
 
 # colors
 class color:
@@ -124,7 +124,7 @@ if __name__ == "__main__":
   # give our role switch session a name and build our aws command
   session = profile + '-' + time.strftime('%d%m%y%H%M%S')
   cmd = [
-    shutil.which('aws'), 'sts', 'assume-role',
+    find_executable('aws'), 'sts', 'assume-role',
     '--role-arn', role,             # Role ARN
     '--role-session-name', session, # Session ID given to temporary credentials
     '--profile', profile,           # Profile name from ~/.aws/config
