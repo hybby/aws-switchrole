@@ -4,8 +4,8 @@ a script to generate temporary credentials for aws roles.
 use it if you need environment variablised credentials for use with tools
 that don't support role switching (looking at you apex).
 
-### usage
 
+### usage
 provide a profile name that you have configured in `~/.aws/config`
 
 ```
@@ -26,10 +26,12 @@ export AWS_SECURITY_TOKEN=xxx
 ```
 
 paste 'em into your shell and you're good to go for a while.  creds last for
-one hour.  sadly we can't set up the environment from a child process, so this
-will have to do.
+one hour.  sadly we can't set up the environment from a child process, so copy
+and pasting into your environment will have to do.
 
 
-### to-do
-
-* [ ] print informational messages to `STDERR` to allow `eval()` to work
+### installation
+  1. clone this repo
+  2. set up an alias or symlink to the script.  for example:
+    a) `alias aws-switchrole="${HOME}/git/aws-switchrole/aws-switchrole.py"` (remember to put in your dotfiles)
+    b) `ln -s ${HOME}/git/aws-switchrole/aws-switchrole.py ${HOME}/bin/aws-switchrole`
