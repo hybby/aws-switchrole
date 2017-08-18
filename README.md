@@ -32,6 +32,6 @@ and pasting into your environment will have to do.
 
 ### installation
   1. clone this repo
-  2. set up an alias or symlink to the script.  for example:
-    a) `alias aws-switchrole="${HOME}/git/aws-switchrole/aws-switchrole.py"` (remember to put in your dotfiles)
-    b) `ln -s ${HOME}/git/aws-switchrole/aws-switchrole.py ${HOME}/bin/aws-switchrole`
+  2. set up an alias or symlink to the script.  for example:  
+    a) `alias aws-switchrole="${HOME}/git/aws-switchrole/aws-switchrole.py"` (remember to put in your dotfiles)  
+    b) `ln -s ${HOME}/git/aws-switchrole/aws-switchrole.py ${HOME}/bin/aws-switchrole`  
