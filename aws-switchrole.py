@@ -166,10 +166,14 @@ if __name__ == "__main__":
     }
 
     print_ok("got temporary credentials for profile '{}'".format(profile))
+    print '---------- load the variables below into your env to assume the selected role ----------'
 
     for k, v in env_vars.iteritems():
       print " export {}={}".format(k,v)
 
+    print '----------------------------------------------------------------------------------------'
+
   except:
-    print_error('response from AWS did not contain expected values.  dumping below:\n{}'.format(creds))
+    print_error('response from AWS did not contain expected values.  dumping below:')
+    print creds
     sys.exit(1)
