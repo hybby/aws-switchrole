@@ -145,7 +145,7 @@ if __name__ == "__main__":
   try:
     creds = json.loads(out)
   except:
-    print_warning('Problem parsing response from AWS.  STDOUT and STDERR below:')
+    print_warning('problem parsing response from AWS.  STDOUT and STDERR below:')
     print_color(color.yellow)
     print 'STDOUT:'
     print_color(color.normal)
@@ -165,11 +165,11 @@ if __name__ == "__main__":
       'AWS_SECURITY_TOKEN': creds['Credentials']['SessionToken'],
     }
 
-    print_ok("Got temporary credentials for profile '{}'".format(profile))
+    print_ok("got temporary credentials for profile '{}'".format(profile))
 
     for k, v in env_vars.iteritems():
       print " export {}={}".format(k,v)
 
   except:
-    print_error('Response from AWS did not contain expected values.  Dumping below:\n{}'.format(creds))
+    print_error('response from AWS did not contain expected values.  dumping below:\n{}'.format(creds))
     sys.exit(1)
