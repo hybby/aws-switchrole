@@ -12,6 +12,7 @@ import sys
 import re
 from distutils.spawn import find_executable
 
+
 # colors
 class color:
   blue = '\033[94m'
@@ -22,16 +23,14 @@ class color:
   underline = '\033[4m'
   normal = '\033[0m'
 
-# -----------
-# subroutines
-# -----------
 
 # print color codes that correspond with the above class
 def print_color(color):
-  sys.stdout.write(color) # no pesky newlines plz
+  sys.stdout.write(color)  # no pesky newlines plz
   sys.stdout.flush()
 
 
+# red text and bomb out
 def print_error(text):
   print_color(color.red)
   print text
@@ -39,19 +38,21 @@ def print_error(text):
   sys.exit(1)
 
 
+# yellow text
 def print_warning(text):
   print_color(color.yellow)
   print text
   print_color(color.normal)
 
 
+# green text
 def print_ok(text):
   print_color(color.green)
   print text
   print_color(color.normal)
 
 
-# given a list of config sections, return a list of those that look like profiles
+# given a list of config sections, return ones that look like profiles
 def get_profiles(config_sections):
   profiles = []
   profile_pattern = re.compile('^profile (\w+)$')
@@ -62,6 +63,7 @@ def get_profiles(config_sections):
       profiles.append(result.group(1))
 
   return sorted(profiles)
+
 
 # given a list of profiles, ask the user to pick one and return that.
 def get_profile_choice(profiles):
@@ -86,16 +88,13 @@ def get_profile_choice(profiles):
     else:
       print_warning('please choose a valid value')
   else:
-    print_error("FATAL: couldn't find any profiles in '{}'".format(config_file))
+    print_error(
+      "FATAL: couldn't find any profiles in '{}'".format(config_file)
+    )
     sys.exit(1)
 
 
-# ---------
-# main
-# ---------
-
 if __name__ == "__main__":
-
   # open our aws config file
   config_file = '~/.aws/config'
   config = ConfigParser.RawConfigParser()
@@ -123,19 +122,20 @@ if __name__ == "__main__":
 
   print_ok("using profile '{}'".format(profile))
 
-
   try:
     role = config.get("profile {}".format(profile), "role_arn")
   except:
-    print_error("FATAL: couldn't find profile '{}' in '{}'".format(profile, config_file))
+    print_error(
+      "FATAL: couldn't find profile '{}' in '{}'".format(profile, config_file)
+    )
 
   # give our role switch session a name and build our aws command
   session = profile + '-' + time.strftime('%d%m%y%H%M%S')
   cmd = [
     find_executable('aws'), 'sts', 'assume-role',
-    '--role-arn', role,             # Role ARN
-    '--role-session-name', session, # Session ID given to temporary credentials
-    '--profile', profile,           # Profile name from ~/.aws/config
+    '--role-arn', role,              # Role ARN
+    '--role-session-name', session,  # Session ID given to temp credentials
+    '--profile', profile,            # Profile name from ~/.aws/config
   ]
 
   process = subprocess.Popen(cmd, stdout=subprocess.PIPE)
@@ -145,7 +145,7 @@ if __name__ == "__main__":
   try:
     creds = json.loads(out)
   except:
-    print_warning('problem parsing response from AWS.  STDOUT and STDERR below:')
+    print_warning('problem parsing AWS response. STDOUT and STDERR below:')
     print_color(color.yellow)
     print 'STDOUT:'
     print_color(color.normal)
@@ -166,14 +166,14 @@ if __name__ == "__main__":
     }
 
     print_ok("got temporary credentials for profile '{}'".format(profile))
-    print '---------- load the variables below into your env to assume the selected role ----------'
+    print "----- load vars below into your env to assume profile's role -----"
 
     for k, v in env_vars.iteritems():
-      print " export {}={}".format(k,v)
+      print " export {}={}".format(k, v)
 
-    print '----------------------------------------------------------------------------------------'
+    print '------------------------------------------------------------------'
 
   except:
-    print_error('response from AWS did not contain expected values.  dumping below:')
+    print_error('AWS response did not contain expected values. dumping below:')
     print creds
     sys.exit(1)
