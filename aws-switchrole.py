@@ -61,7 +61,7 @@ def get_profiles(config_sections):
     if result:
       profiles.append(result.group(1))
 
-  return profiles
+  return sorted(profiles)
 
 # given a list of profiles, ask the user to pick one and return that.
 def get_profile_choice(profiles):
