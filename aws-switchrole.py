@@ -77,7 +77,7 @@ def get_profile_choice(profiles):
     i = 0
     valid_choice = False
 
-    print_warning('no profile provided. please choose your profile:')
+    print_warning('please choose your profile:')
 
     if profiles:
         for profile in profiles:
