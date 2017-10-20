@@ -32,6 +32,37 @@ and pasting into your environment will have to do.
 
 ### installation
   1. clone this repo
-  2. set up an alias or symlink to the script.  for example:  
-    a) `alias aws-switchrole="${HOME}/git/aws-switchrole/aws-switchrole.py"` (remember to put in your dotfiles)  
-    b) `ln -s ${HOME}/git/aws-switchrole/aws-switchrole.py ${HOME}/bin/aws-switchrole`  
+  2. make sure you have [`aws-cli`](http://docs.aws.amazon.com/cli/latest/userguide/installing.html) installed:
+
+  ```
+  pip install awscli --upgrade --user
+  ```
+
+  3. ensure your `~/.aws/credentials` and `~/.aws/config` files are configured.  i use the latter for profiles:
+
+  ```
+  $ cat ~/.aws/credentials
+  [default]
+  aws_access_key_id = XXX
+  aws_secret_access_key = XXX
+  ```
+
+  ```
+  $ cat ~/.aws/config
+  [profile samplerole]
+  output = json
+  region = us-east-1
+  role_arn = arn:aws:iam::${aws_account_id_with_target_role}:role/SampleRoleName
+  mfa_serial = arn:aws:iam::${aws_account_id_with_iam_info}:mfa/your.iam.username
+  source_profile = default
+  ```
+
+  3. set up an alias or symlink to the script.  for example:
+
+  ```
+  # create a shell alias (remember to add to your dotfiles!)
+  alias aws-switchrole="${HOME}/git/aws-switchrole/aws-switchrole.py"
+
+  # or alternatively, symlink it to a place in your $PATH (i use `${HOME}/bin` for this)
+  ln -s ${HOME}/git/aws-switchrole/aws-switchrole.py ${HOME}/bin/aws-switchrole`
+  ```
