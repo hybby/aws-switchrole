@@ -62,7 +62,7 @@ def print_info(text):
 # given a list of config sections, return ones that look like profiles
 def get_profiles(config_sections):
     profiles = []
-    profile_pattern = re.compile('^profile (\w+)$')
+    profile_pattern = re.compile('^profile (\w+-?\w+)$')
 
     for section in config_sections:
         result = profile_pattern.search(section)
