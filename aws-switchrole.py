@@ -62,7 +62,8 @@ def print_info(text):
 # given a list of config sections, return ones that look like profiles
 def get_profiles(config_sections):
     profiles = []
-    profile_pattern = re.compile('^profile (\w+)$')
+    profile_re = r'^profile ([A-Za-z0-9_-]+)$'
+    profile_pattern = re.compile(profile_re)
 
     for section in config_sections:
         result = profile_pattern.search(section)
@@ -133,7 +134,7 @@ if __name__ == "__main__":
         role = config.get("profile {}".format(profile), "role_arn")
     except:
         print_error(
-            "FATAL: couldn't find profile '{}' in '{}'".format(
+            "FATAL: couldn't find a role_arn section in profile '{}'".format(
                 profile,
                 config_file
             )
