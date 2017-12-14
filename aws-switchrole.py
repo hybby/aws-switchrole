@@ -77,6 +77,7 @@ def get_profiles(config_sections):
 def get_profile_choice(profiles):
     i = 0
     valid_choice = False
+    valid_profiles = []
 
     print_warning('please choose a profile to source role from:')
 
@@ -87,6 +88,7 @@ def get_profile_choice(profiles):
             if config.has_option("profile {}".format(profile), "role_arn"):
                 role = config.get("profile {}".format(profile), "role_arn")
                 print "  {}. {} ({})".format((i + 1), profile, role)
+                valid_profiles.append(profile)
                 i += 1
     else:
         print_error(
@@ -99,9 +101,9 @@ def get_profile_choice(profiles):
         except ValueError:
             choice = 0
 
-        if choice > 0 and choice < (len(profiles) + 1):
+        if choice > 0 and choice < (len(valid_profiles) + 1):
             valid_choice = True
-            return profiles[(choice - 1)]
+            return valid_profiles[(choice - 1)]
         else:
             print_warning('please choose a valid value')
 
