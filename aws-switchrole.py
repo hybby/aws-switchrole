@@ -122,6 +122,7 @@ if __name__ == "__main__":
 
     parser.add_argument(
         '--use-default',
+        '--use-the-force',
         action='store_true',
         required=False,
         default=False,
