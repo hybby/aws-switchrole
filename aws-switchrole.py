@@ -78,12 +78,16 @@ def get_profile_choice(profiles):
     i = 0
     valid_choice = False
 
-    print_warning('please choose your profile:')
+    print_warning('please choose a profile to source role from:')
 
     if profiles:
+        # loop through all profiles
         for profile in profiles:
-            print "  {}. {}".format((i + 1), profile)
-            i += 1
+            # make sure profile has a role_arn to assume
+            if config.has_option("profile {}".format(profile), "role_arn"):
+                role = config.get("profile {}".format(profile), "role_arn")
+                print "  {}. {} ({})".format((i + 1), profile, role)
+                i += 1
     else:
         print_error(
             "FATAL: couldn't find any profiles in '{}'".format(config_file)
@@ -112,6 +116,14 @@ if __name__ == "__main__":
     # parse command-line arguments
     parser = argparse.ArgumentParser(
         description='gets temporary credentials for switching to an aws role'
+    )
+
+    parser.add_argument(
+        '--use-default',
+        action='store_true',
+        required=False,
+        default=False,
+        help='Use the default profile and credentials when assuing the role'
     )
 
     parser.add_argument(
@@ -146,8 +158,11 @@ if __name__ == "__main__":
         find_executable('aws'), 'sts', 'assume-role',
         '--role-arn', role,              # Role ARN
         '--role-session-name', session,  # Session ID given to temp credentials
-        '--profile', profile,            # Profile name from ~/.aws/config
     ]
+
+    if not args.use_default:
+        cmd.append('--profile')
+        cmd.append(profile) # Profile name from ~/.aws/config
 
     process = subprocess.Popen(cmd, stdout=subprocess.PIPE)
     out, err = process.communicate()
