@@ -118,7 +118,15 @@ if __name__ == "__main__":
         '--profile',
         type=str,
         required=False,
-        help='profile in ~/.aws/config with role you want to switch to'
+        help='profile in ~/.aws/config with role to switch to'
+    )
+
+    parser.add_argument(
+        '--duration-seconds',
+        type=int,
+        required=False,
+        default=3600,
+        help='time in seconds that sts credentials should last'
     )
 
     args = parser.parse_args()
@@ -128,7 +136,10 @@ if __name__ == "__main__":
     else:
         profile = get_profile_choice(profiles)
 
+    duration_seconds = str(args.duration_seconds)
+
     print_ok("using profile '{}'".format(profile))
+    print_ok("credentials will be valid for {} secs".format(duration_seconds))
 
     try:
         role = config.get("profile {}".format(profile), "role_arn")
@@ -144,9 +155,10 @@ if __name__ == "__main__":
     session = profile + '-' + time.strftime('%d%m%y%H%M%S')
     cmd = [
         find_executable('aws'), 'sts', 'assume-role',
-        '--role-arn', role,              # Role ARN
-        '--role-session-name', session,  # Session ID given to temp credentials
-        '--profile', profile,            # Profile name from ~/.aws/config
+        '--role-arn', role,                     # Role ARN from profile
+        '--role-session-name', session,         # Session ID for temp creds
+        '--profile', profile,                   # Selected AWS-CLI profile name
+        '--duration-seconds', duration_seconds  # Credential expiration in secs
     ]
 
     process = subprocess.Popen(cmd, stdout=subprocess.PIPE)

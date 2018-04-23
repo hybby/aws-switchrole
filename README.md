@@ -9,10 +9,15 @@ that don't support role switching (looking at you apex).
 provide a profile name that you have configured in `~/.aws/config`
 
 ```
-$ aws-switchrole.py --profile profile-name
+$ aws-switchrole.py --profile profile-name [--duration-seconds <secs>]
 ```
 
 if you don't provide a profile, you'll be asked to pick from a list.
+
+optionally, provide a period of time you'd like the generated credentials
+to be valid for, in seconds (`--duration-seconds`).  the minimum is 15 mins
+(900s).  the maximum is 12 hrs (43200).  an aws exception will be thrown if
+this is not valid.  defaults to 1 hr (3600)
 
 we then use the `role_arn` to perform an `aws sts assume-role` command and
 print out the resultant credentials as `export` commands, ready for you to
