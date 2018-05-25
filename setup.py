@@ -1,16 +1,14 @@
 from setuptools import find_packages, setup
-import sys
-
 
 kw = {}
 
 setup(
-    name='aws-switchrolel',
+    name='aws-switchrole',
     version='0.1',
     author='hybby',
     author_email='dev@fanduel.com',
     url='https://github.com/hybby/aws-switchrole',
-    description='aws-switchrole',
+    description='iamdrew@gmail.com',
     packages=find_packages(),
     install_requires=[
         'awscli>=1.15.25',

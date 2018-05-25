@@ -106,7 +106,7 @@ def get_profile_choice(profiles):
             print_warning('please choose a valid value')
 
 
-if __name__ == "__main__":
+def main():
     # open our aws config file
     config_file = '~/.aws/config'
     config = configparser.RawConfigParser()
@@ -218,3 +218,6 @@ if __name__ == "__main__":
         print_error('AWS response did not contain expected valuess. dumping:')
         print(creds)
         sys.exit(1)
+
+if __name__ == "__main__":
+    main()
