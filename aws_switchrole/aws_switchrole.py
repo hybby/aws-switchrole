@@ -178,7 +178,6 @@ if __name__ == "__main__":
     # load the json response into a dict
     try:
         creds = json.loads(out.decode('utf-8'))
-        print(creds)
     except:
         print_warning('problem parsing AWS response. STDOUT and STDERR below:')
         print_warning('STDOUT:')
