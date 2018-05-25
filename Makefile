@@ -1,6 +1,5 @@
 define HELP
 make requirements   - Install requirements in your virtualenv
-make release      - Deploy package in internal PyPI (only if you have permission)
 endef
 
 export HELP
@@ -18,5 +17,3 @@ requirements: .requirements.txt
 	pip install -r requirements.txt
 	pip freeze > $@
 
-release:
-	python setup.py sdist upload -r internal
