@@ -1,5 +1,6 @@
 define HELP
 make requirements   - Install requirements in your virtualenv
+make release      - Deploy package in internal PyPI (only if you have permission)
 endef
 
 export HELP
