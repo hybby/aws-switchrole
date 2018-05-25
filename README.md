@@ -38,7 +38,7 @@ optionally the '--copy' option will copy the exports to the clipboard automatica
 
 
 # Installation
-  1. pip install aws-switchrole --extra-index-url https://localpypi.east.fdbox.net/simple/
+  1. pip install aws-switchrole
   2. ensure your `~/.aws/credentials` and `~/.aws/config` files are configured.  i use the latter for profiles:
 
   ```
