@@ -1,0 +1,2 @@
+awscli>=1.15.25
+pyperclip>=1.6.0

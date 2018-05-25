@@ -3,7 +3,10 @@
 # use it if you need environment variablised credentials for use with tools
 # that don't support role switching (looking at you apex and terraform).
 import os
-import ConfigParser
+try:
+    import configparser
+except ImportError:
+    import ConfigParser as configparser
 import argparse
 import time
 import subprocess
@@ -11,6 +14,7 @@ import json
 import sys
 import re
 from distutils.spawn import find_executable
+import pyperclip
 
 
 # colors
@@ -33,7 +37,7 @@ def print_color(color):
 # red text and bomb out
 def print_error(text):
     print_color(color.red)
-    print text
+    print(text)
     print_color(color.normal)
     sys.exit(1)
 
@@ -41,21 +45,21 @@ def print_error(text):
 # yellow text
 def print_warning(text):
     print_color(color.yellow)
-    print text
+    print(text)
     print_color(color.normal)
 
 
 # green text
 def print_ok(text):
     print_color(color.green)
-    print text
+    print(text)
     print_color(color.normal)
 
 
 # blue text
 def print_info(text):
     print_color(color.blue)
-    print text
+    print(text)
     print_color(color.normal)
 
 
@@ -82,7 +86,7 @@ def get_profile_choice(profiles):
 
     if profiles:
         for profile in profiles:
-            print "  {}. {}".format((i + 1), profile)
+            print("  {}. {}".format((i + 1), profile))
             i += 1
     else:
         print_error(
@@ -91,7 +95,7 @@ def get_profile_choice(profiles):
 
     while not valid_choice:
         try:
-            choice = int(raw_input("-> "))
+            choice = int(input("-> "))
         except ValueError:
             choice = 0
 
@@ -102,10 +106,10 @@ def get_profile_choice(profiles):
             print_warning('please choose a valid value')
 
 
-if __name__ == "__main__":
+def main():
     # open our aws config file
     config_file = '~/.aws/config'
-    config = ConfigParser.RawConfigParser()
+    config = configparser.RawConfigParser()
     config.read(os.path.expanduser(config_file))
     profiles = get_profiles(config.sections())
 
@@ -127,6 +131,13 @@ if __name__ == "__main__":
         required=False,
         default=3600,
         help='time in seconds that sts credentials should last'
+    )
+
+    parser.add_argument(
+        '--copy',
+        action='append_const',
+        const=True,
+        help='copy export command to clipboard'
     )
 
     args = parser.parse_args()
@@ -166,13 +177,13 @@ if __name__ == "__main__":
 
     # load the json response into a dict
     try:
-        creds = json.loads(out)
+        creds = json.loads(out.decode('utf-8'))
     except:
         print_warning('problem parsing AWS response. STDOUT and STDERR below:')
         print_warning('STDOUT:')
-        print out
+        print(out)
         print_warning('STDERR:')
-        print err
+        print(err)
         sys.exit(1)
 
     # print out our returned values as export commands, ready to go.
@@ -189,14 +200,24 @@ if __name__ == "__main__":
             "---- load these vars into your env to assume profile's role ----"
         )
 
-        for k, v in env_vars.iteritems():
-            print " export {}={}".format(k, v)
+        stuff_to_copy=[]
+        for k, v in env_vars.items():
+            cmd = "export {}={}".format(k, v)
+            print('{}'.format(cmd))
+            stuff_to_copy.append(cmd)
+
+        if args.copy:
+            pyperclip.copy("\n".join(stuff_to_copy) + '\n')
 
         print_info(
             '----------------------------------------------------------------'
         )
 
+
     except:
         print_error('AWS response did not contain expected valuess. dumping:')
-        print creds
+        print(creds)
         sys.exit(1)
+
+if __name__ == "__main__":
+    main()

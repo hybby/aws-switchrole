@@ -1,4 +1,4 @@
-## aws-switchrole
+# aws-switchrole
 a script to generate temporary credentials for aws roles.
 
 use it if you need environment variablised credentials for use with tools
@@ -34,16 +34,12 @@ paste 'em into your shell and you're good to go for a while.  creds last for
 one hour.  sadly we can't set up the environment from a child process, so copy
 and pasting into your environment will have to do.
 
+optionally the '--copy' option will copy the exports to the clipboard automatically
 
-### installation
-  1. clone this repo
-  2. make sure you have [`aws-cli`](http://docs.aws.amazon.com/cli/latest/userguide/installing.html) installed:
 
-  ```
-  pip install awscli --upgrade --user
-  ```
-
-  3. ensure your `~/.aws/credentials` and `~/.aws/config` files are configured.  i use the latter for profiles:
+# Installation
+  1. pip install aws-switchrole
+  2. ensure your `~/.aws/credentials` and `~/.aws/config` files are configured.  i use the latter for profiles:
 
   ```
   $ cat ~/.aws/credentials
@@ -62,12 +58,46 @@ and pasting into your environment will have to do.
   source_profile = default
   ```
 
-  3. set up an alias or symlink to the script.  for example:
+# Development
+
+PRs welcome and encouraged.
+
+Contributed code has to be compatible with python 2 and python 3
+
+
+# Publishing
+
+for my own benefit, mainly.
+
+make sure `~/.pypirc` is configured correctly for `pypitest` and `pypi`.
+
+tag your latest commit
 
   ```
-  # create a shell alias (remember to add to your dotfiles!)
-  alias aws-switchrole="${HOME}/git/aws-switchrole/aws-switchrole.py"
-
-  # or alternatively, symlink it to a place in your $PATH (i use `${HOME}/bin` for this)
-  ln -s ${HOME}/git/aws-switchrole/aws-switchrole.py ${HOME}/bin/aws-switchrole`
+  git tag -a 0.1 'release notes'
+  git push --tags
   ```
+
+upload to the test pypi with
+
+  ```
+  python setup.py sdist upload -r pypitest
+  ```
+
+and the real one with
+
+  ```
+  python setup.py sdist upload -r pypi
+  ```
+
+## Set up
+
+* `mkvirtualenv aws-switchrole`
+* `make requirements`
+
+
+## Simulating package install
+
+If you want to use the code as if it was installed in your virtualenv (for example to use the CLI tool while you develop):
+
+* `pip install --editable .` , where `.` is the path to the folder containing `setup.py`
