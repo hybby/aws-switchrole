@@ -34,7 +34,7 @@ paste 'em into your shell and you're good to go for a while.  creds last for
 one hour.  sadly we can't set up the environment from a child process, so copy
 and pasting into your environment will have to do.
 
-optionally the '--copy' option will cvopy the exports to the clipboard automatically
+optionally the '--copy' option will copy the exports to the clipboard automatically
 
 
 # Installation
