@@ -64,6 +64,32 @@ PRs welcome and encouraged.
 
 Contributed code has to be compatible with python 2 and python 3
 
+
+# Publishing
+
+for my own benefit, mainly.
+
+make sure `~/.pypirc` is configured correctly for `pypitest` and `pypi`.
+
+tag your latest commit
+
+  ```
+  git tag -a 0.1 'release notes'
+  git push --tags
+  ```
+
+upload to the test pypi with
+
+  ```
+  python setup.py sdist upload -r pypitest
+  ```
+
+and the real one with
+
+  ```
+  python setup.py sdist upload -r pypi
+  ```
+
 ## Set up
 
 * `mkvirtualenv aws-switchrole`
