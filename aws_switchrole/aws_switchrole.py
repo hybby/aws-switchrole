@@ -84,14 +84,9 @@ def get_profile_choice(profiles):
 
     print_warning('please choose your profile:')
 
-    if profiles:
-        for profile in profiles:
-            print("  {}. {}".format((i + 1), profile))
-            i += 1
-    else:
-        print_error(
-            "FATAL: couldn't find any profiles in '{}'".format(config_file)
-        )
+    for profile in profiles:
+        print("  {}. {}".format((i + 1), profile))
+        i += 1
 
     while not valid_choice:
         try:
@@ -112,6 +107,11 @@ def main():
     config = configparser.RawConfigParser()
     config.read(os.path.expanduser(config_file))
     profiles = get_profiles(config.sections())
+
+    if not profiles:
+        print_error(
+            "FATAL: couldn't find any profiles in '{}'".format(config_file)
+        )
 
     # parse command-line arguments
     parser = argparse.ArgumentParser(
